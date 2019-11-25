@@ -27,10 +27,10 @@ interests:
 
 education:
   courses:
-  - course: MSc (Mathematics and Statistics)
+  - course: Master of Science in Mathematics and Statistics
     institution: University of Melbourne
     year: 2016
-  - course: BSc (Pure Mathematics)
+  - course: Bachelor of Science in Pure Mathematics
     institution: University of Western Australia
     year: 2009
 
