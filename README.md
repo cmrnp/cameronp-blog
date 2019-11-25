@@ -1,2 +1,2 @@
 # cameronp-blog
-My blog
+Personal blog of Cameron Patrick

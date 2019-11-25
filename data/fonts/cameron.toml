@@ -1,0 +1,11 @@
+# Font style metadata
+name = "Cameron"
+
+# Optional Google font URL
+google_fonts = "Montserrat:400,700|Merriweather:400,400i,700|Inconsolata"
+
+# Font families
+heading_font = "Montserrat"
+body_font = "Merriweather"
+nav_font = "Montserrat"
+mono_font = "Inconsolata"
