@@ -1,0 +1,67 @@
+---
+title: Plotting multiple variables at once using ggplot2 and tidyr
+author: Cameron Patrick
+date: '2019-11-26'
+draft: true
+slug: plotting-multiple-variables-ggplot2-tidyr
+categories: []
+tags:
+  - r
+  - ggplot2
+  - tidyr
+  - graphs
+subtitle: ''
+summary: ''
+lastmod: '2019-11-26T08:00:00+11:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+
+<p>In exploratory data analysis, it’s common to want to make similar
+plots of a number of variables at once. For example, a randomised trial may
+look at several outcomes, or a survey may have a large number of items. Some
+packages—for example, Minitab—make it easy to put several variables on the
+same plot with an option for “multiple Ys”. Here are a couple of ways of achieving
+the same thing using R and <code>ggplot2</code>.</p>
+<div id="pivoting-longer-turning-your-variables-into-rows" class="section level2">
+<h2>Pivoting longer: turning your variables into rows</h2>
+<p><code>ggplot2</code> doesn’t provide an easy facility to plot multiple variables
+at once because this is usually a sign that <a href="https://vita.had.co.nz/papers/tidy-data.pdf">your data is not “tidy”</a>. For example, if you want
+to plot two variables on a graph as points with different colours, the two
+columns probably really represent the same variable, and there is a hidden
+grouping factor which distinguishes the data points you want to colour differently.
+The usual answer in this scenario is that you
+should restructure your data before plotting it. As a bonus, it will probably be
+easier to analyse that way too.</p>
+<p>It is less obviously true that if you want to split a plot into panels (or
+facets, in <code>ggplot2</code>-speak) then the different panels must represent an underlying grouping factor, but as far as <code>gglot2</code> is concerned, the same logic applies:
+you must plot a single response variable, with a grouping variable to indicate
+which panel the data should be plotted in.
+The best structure for your data depends
+on what you’re trying to do with it, and in this situation, even if your data
+is in the right form for modelling, it may not be right for the plots you want
+to make.</p>
+<p>Fortunately, this kind of restructuring is straightforward using the <code>tidyr</code>
+package and the <code>pivot_longer()</code> function. For example, if a survey has six
+questions stored in variables <code>Q1</code> through <code>Q6</code>, you can convert that to a
+longer data frame where the question number is stored in one column and the
+response is stored in a separate column:</p>
+<pre class="r"><code>longer_data &lt;- survey_data %&gt;%
+    pivot_longer(Q1:Q6, names_to = &quot;question&quot;, values_to = &quot;response&quot;)</code></pre>
+<p>You don’t even need to store the ‘long form’ data as a separate variable; it’s
+possible to pipe data straight into <code>ggplot2</code>:</p>
+<pre class="r"><code>survey_data %&gt;%
+    pivot_longer(Q1:Q6, names_to = &quot;question&quot;, values_to = &quot;response&quot;) %&gt;%
+    ggplot(aes(x = response)) +
+    geom_bar() +
+    facet_wrap(vars(question))</code></pre>
+</div>
+<div id="making-multiple-plots-and-combining-them-with-grid.arrange" class="section level2">
+<h2>Making multiple plots and combining them with grid.arrange</h2>
+</div>
