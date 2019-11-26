@@ -48,19 +48,45 @@ on what you’re trying to do with it, and in this situation, even if your data
 is in the right form for modelling, it may not be right for the plots you want
 to make.</p>
 <p>Fortunately, this kind of restructuring is straightforward using the <code>tidyr</code>
-package and the <code>pivot_longer()</code> function. For example, if a survey has six
-questions stored in variables <code>Q1</code> through <code>Q6</code>, you can convert that to a
+package and the <code>pivot_longer()</code> function. For example, if you have a survey with six
+questions stored in variables <code>Q1</code> through <code>Q6</code>. The original data frame looks like
+this:</p>
+<pre class="r"><code>glimpse(survey_data)</code></pre>
+<pre><code>## Observations: 300
+## Variables: 7
+## $ group &lt;int&gt; 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1,...
+## $ Q1    &lt;int&gt; 4, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 2, 4, 4, 3, 4, 5, 4,...
+## $ Q2    &lt;int&gt; 1, 2, 4, 1, 2, 3, 3, 3, 4, 4, 4, 2, 3, 2, 4, 2, 2, 4, 5,...
+## $ Q3    &lt;int&gt; 4, 5, 4, 5, 5, 5, 5, 5, 4, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4,...
+## $ Q4    &lt;int&gt; 1, 4, 2, 2, 1, 3, 1, 1, 1, 2, 1, 1, 2, 2, 1, 3, 4, 2, 2,...
+## $ Q5    &lt;int&gt; 2, 3, 2, 4, 1, 2, 4, 2, 3, 5, 4, 5, 4, 4, 2, 2, 5, 4, 4,...
+## $ Q6    &lt;int&gt; 3, 3, 3, 3, 2, 2, 1, 1, 2, 4, 3, 2, 4, 4, 3, 3, 3, 2, 3,...</code></pre>
+<p>You can convert this into a
 longer data frame where the question number is stored in one column and the
 response is stored in a separate column:</p>
 <pre class="r"><code>longer_data &lt;- survey_data %&gt;%
-    pivot_longer(Q1:Q6, names_to = &quot;question&quot;, values_to = &quot;response&quot;)</code></pre>
+  pivot_longer(Q1:Q6, names_to = &quot;question&quot;, values_to = &quot;response&quot;)
+glimpse(longer_data)</code></pre>
+<pre><code>## Observations: 1,800
+## Variables: 3
+## $ group    &lt;int&gt; 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,...
+## $ question &lt;chr&gt; &quot;Q1&quot;, &quot;Q2&quot;, &quot;Q3&quot;, &quot;Q4&quot;, &quot;Q5&quot;, &quot;Q6&quot;, &quot;Q1&quot;, &quot;Q2&quot;, &quot;Q3&quot;,...
+## $ response &lt;int&gt; 4, 1, 4, 1, 2, 3, 5, 2, 5, 4, 3, 3, 5, 4, 4, 2, 2, 3,...</code></pre>
 <p>You don’t even need to store the ‘long form’ data as a separate variable; it’s
-possible to pipe data straight into <code>ggplot2</code>:</p>
+possible to pipe data straight into <code>ggplot2</code>. Here I use the <code>facet_wrap()</code>
+function to make each question a separate panel:</p>
 <pre class="r"><code>survey_data %&gt;%
-    pivot_longer(Q1:Q6, names_to = &quot;question&quot;, values_to = &quot;response&quot;) %&gt;%
-    ggplot(aes(x = response)) +
-    geom_bar() +
-    facet_wrap(vars(question))</code></pre>
+  pivot_longer(Q1:Q6, names_to = &quot;question&quot;, values_to = &quot;response&quot;) %&gt;%
+  ggplot(aes(x = response)) +
+  geom_bar() +
+  facet_wrap(vars(question), ncol = 3) +
+  labs(x = &quot;Response&quot;, y = &quot;Number of respondents&quot;)</code></pre>
+<p><img src="/post/2019/11/plotting-multiple-variables-ggplot2-tidyr/index_files/figure-html/panel-plot-1.png" width="720" /></p>
+<p>By default, R will sort the order of factors alphabetically. This isn’t necessarily
+what you want in this situation. The <code>fct_inorder()</code> function allows you to reorder
+levels of a factor in the order of first appearance in the file. If you use that
+with the column produced by <code>pivot_longer()</code>, the factor will be ordered by the
+order of the columns in the original data frame.</p>
 </div>
 <div id="making-multiple-plots-and-combining-them-with-grid.arrange" class="section level2">
 <h2>Making multiple plots and combining them with grid.arrange</h2>
