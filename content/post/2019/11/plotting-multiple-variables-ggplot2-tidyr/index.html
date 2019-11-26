@@ -2,7 +2,7 @@
 title: Plotting multiple variables at once using ggplot2 and tidyr
 author: Cameron Patrick
 date: '2019-11-26'
-draft: true
+draft: false
 slug: plotting-multiple-variables-ggplot2-tidyr
 categories: []
 tags:
@@ -11,8 +11,10 @@ tags:
   - tidyr
   - graphs
 subtitle: ''
-summary: ''
-lastmod: '2019-11-26T08:00:00+11:00'
+summary: 'In exploratory data analysis, it''s common to want to make similar
+  plots of a number of variables at once. Here is a way to achieve
+  the same thing using R and `ggplot2`.'
+lastmod: '2019-11-26T11:00:00+11:00'
 featured: no
 image:
   caption: ''
@@ -25,69 +27,103 @@ projects: []
 
 <p>In exploratory data analysis, it’s common to want to make similar
 plots of a number of variables at once. For example, a randomised trial may
-look at several outcomes, or a survey may have a large number of items. Some
+look at several outcomes, or a survey may have a large number of questions. Some
 packages—for example, Minitab—make it easy to put several variables on the
-same plot with an option for “multiple Ys”. Here are a couple of ways of achieving
+same plot with an option for “multiple Ys”. Here is a way to achieve
 the same thing using R and <code>ggplot2</code>.</p>
 <div id="pivoting-longer-turning-your-variables-into-rows" class="section level2">
 <h2>Pivoting longer: turning your variables into rows</h2>
 <p><code>ggplot2</code> doesn’t provide an easy facility to plot multiple variables
-at once because this is usually a sign that <a href="https://vita.had.co.nz/papers/tidy-data.pdf">your data is not “tidy”</a>. For example, if you want
-to plot two variables on a graph as points with different colours, the two
-columns probably really represent the same variable, and there is a hidden
+at once because this is usually a sign that <a href="https://r4ds.had.co.nz/tidy-data.html">your data is not “tidy”</a>. For example, in situations where you want
+to plot two columns on a graph as points with different colours, the two
+columns often really represent the same variable, and there is a hidden
 grouping factor which distinguishes the data points you want to colour differently.
 The usual answer in this scenario is that you
 should restructure your data before plotting it. As a bonus, it will probably be
-easier to analyse that way too.</p>
-<p>It is less obviously true that if you want to split a plot into panels (or
-facets, in <code>ggplot2</code>-speak) then the different panels must represent an underlying grouping factor, but as far as <code>gglot2</code> is concerned, the same logic applies:
+easier to analyse your data in that form too.</p>
+<p>Likewise, if you want to split a plot into panels (or
+facets, in <code>ggplot2</code>-speak),
 you must plot a single response variable, with a grouping variable to indicate
 which panel the data should be plotted in.
 The best structure for your data depends
 on what you’re trying to do with it, and in this situation, even if your data
-is in the right form for modelling, it may not be right for the plots you want
+is in the right form for analysis, it may not be right for some of the plots you want
 to make.</p>
-<p>Fortunately, this kind of restructuring is straightforward using the <code>tidyr</code>
-package and the <code>pivot_longer()</code> function. For example, if you have a survey with six
-questions stored in variables <code>Q1</code> through <code>Q6</code>. The original data frame looks like
-this:</p>
-<pre class="r"><code>glimpse(survey_data)</code></pre>
-<pre><code>## Observations: 300
-## Variables: 7
-## $ group &lt;int&gt; 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1,...
-## $ Q1    &lt;int&gt; 4, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 2, 4, 4, 3, 4, 5, 4,...
-## $ Q2    &lt;int&gt; 1, 2, 4, 1, 2, 3, 3, 3, 4, 4, 4, 2, 3, 2, 4, 2, 2, 4, 5,...
-## $ Q3    &lt;int&gt; 4, 5, 4, 5, 5, 5, 5, 5, 4, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4,...
-## $ Q4    &lt;int&gt; 1, 4, 2, 2, 1, 3, 1, 1, 1, 2, 1, 1, 2, 2, 1, 3, 4, 2, 2,...
-## $ Q5    &lt;int&gt; 2, 3, 2, 4, 1, 2, 4, 2, 3, 5, 4, 5, 4, 4, 2, 2, 5, 4, 4,...
-## $ Q6    &lt;int&gt; 3, 3, 3, 3, 2, 2, 1, 1, 2, 4, 3, 2, 4, 4, 3, 3, 3, 2, 3,...</code></pre>
+<p>Fortunately, restructuring your data into the right form is straightforward using the <code>tidyr</code>
+package and the <code>pivot_longer()</code> function. In this example, I’m going to look at some
+mocked-up survey data, with six questions stored in variables <code>Q1</code> through <code>Q6</code>.
+The original data frame looks like this:</p>
+<pre class="r"><code>print(survey_data)</code></pre>
+<pre><code>## # A tibble: 300 x 7
+##    group    Q1    Q2    Q3    Q4    Q5    Q6
+##    &lt;fct&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+##  1 B         4     1     4     1     2     3
+##  2 B         5     2     5     4     3     3
+##  3 B         5     4     4     2     2     3
+##  4 B         5     1     5     2     4     3
+##  5 A         5     2     5     1     1     2
+##  6 A         5     3     5     3     2     2
+##  7 A         4     3     5     1     4     1
+##  8 B         4     3     5     1     2     1
+##  9 B         4     4     4     1     3     2
+## 10 B         4     4     5     2     5     4
+## # ... with 290 more rows</code></pre>
 <p>You can convert this into a
 longer data frame where the question number is stored in one column and the
 response is stored in a separate column:</p>
 <pre class="r"><code>longer_data &lt;- survey_data %&gt;%
   pivot_longer(Q1:Q6, names_to = &quot;question&quot;, values_to = &quot;response&quot;)
-glimpse(longer_data)</code></pre>
-<pre><code>## Observations: 1,800
-## Variables: 3
-## $ group    &lt;int&gt; 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,...
-## $ question &lt;chr&gt; &quot;Q1&quot;, &quot;Q2&quot;, &quot;Q3&quot;, &quot;Q4&quot;, &quot;Q5&quot;, &quot;Q6&quot;, &quot;Q1&quot;, &quot;Q2&quot;, &quot;Q3&quot;,...
-## $ response &lt;int&gt; 4, 1, 4, 1, 2, 3, 5, 2, 5, 4, 3, 3, 5, 4, 4, 2, 2, 3,...</code></pre>
-<p>You don’t even need to store the ‘long form’ data as a separate variable; it’s
-possible to pipe data straight into <code>ggplot2</code>. Here I use the <code>facet_wrap()</code>
-function to make each question a separate panel:</p>
+print(longer_data)</code></pre>
+<pre><code>## # A tibble: 1,800 x 3
+##    group question response
+##    &lt;fct&gt; &lt;chr&gt;       &lt;int&gt;
+##  1 B     Q1              4
+##  2 B     Q2              1
+##  3 B     Q3              4
+##  4 B     Q4              1
+##  5 B     Q5              2
+##  6 B     Q6              3
+##  7 B     Q1              5
+##  8 B     Q2              2
+##  9 B     Q3              5
+## 10 B     Q4              4
+## # ... with 1,790 more rows</code></pre>
+<p>You don’t even need to store the ‘long form’ data as a separate variable. If you’re
+not going to use the data in this form for anything else, it’s
+simpler to pipe the data straight into <code>ggplot2</code>. Here I use the <code>facet_wrap()</code>
+function to plot each question in a separate panel, so we can see the distribution
+of all of the questions at once:</p>
 <pre class="r"><code>survey_data %&gt;%
   pivot_longer(Q1:Q6, names_to = &quot;question&quot;, values_to = &quot;response&quot;) %&gt;%
   ggplot(aes(x = response)) +
   geom_bar() +
   facet_wrap(vars(question), ncol = 3) +
-  labs(x = &quot;Response&quot;, y = &quot;Number of respondents&quot;)</code></pre>
+  labs(x = &quot;Response (on a 1 to 5 scale)&quot;, y = &quot;Number of respondents&quot;)</code></pre>
 <p><img src="/post/2019/11/plotting-multiple-variables-ggplot2-tidyr/index_files/figure-html/panel-plot-1.png" width="720" /></p>
-<p>By default, R will sort the order of factors alphabetically. This isn’t necessarily
-what you want in this situation. The <code>fct_inorder()</code> function allows you to reorder
+<p>You can use <code>question</code> as a factor anywhere else you would use a categorical
+variable with ggplot. For example, you can make some box plots:</p>
+<pre class="r"><code>survey_data %&gt;%
+  pivot_longer(Q1:Q6, names_to = &quot;question&quot;, values_to = &quot;response&quot;) %&gt;%
+  ggplot(aes(y = response, x = question)) +
+  geom_boxplot() +
+  labs(x = &quot;Question&quot;, y = &quot;Response (on a 1 to 5 scale)&quot;)</code></pre>
+<p><img src="/post/2019/11/plotting-multiple-variables-ggplot2-tidyr/index_files/figure-html/box-plot-1.png" width="720" /></p>
+<p>This is also a nice demonstration of how box plots are rarely the best way to
+present Likert scale data.</p>
+<p>Any other variables are retained after you call <code>pivot_longer()</code>, so you can
+e.g. compare the responses to survey questions based on a demographic variable:</p>
+<pre class="r"><code>survey_data %&gt;%
+  pivot_longer(Q1:Q6, names_to = &quot;question&quot;, values_to = &quot;response&quot;) %&gt;%
+  ggplot(aes(x = response, colour = group)) +
+  facet_wrap(vars(question), ncol = 3) +
+  geom_point(stat = &quot;count&quot;) +
+  geom_line(stat = &quot;count&quot;) +
+  labs(x = &quot;Response (on a 1 to 5 scale)&quot;, y = &quot;Number of respondents&quot;)</code></pre>
+<p><img src="/post/2019/11/plotting-multiple-variables-ggplot2-tidyr/index_files/figure-html/line-plot-1.png" width="720" /></p>
+<p>By default, R will sort the levels of factors alphabetically. This isn’t always
+what you want in this situation—often the order of the variables in your data
+frame has some meaning to it. The <code>fct_inorder()</code> function allows you to reorder
 levels of a factor in the order of first appearance in the file. If you use that
 with the column produced by <code>pivot_longer()</code>, the factor will be ordered by the
 order of the columns in the original data frame.</p>
-</div>
-<div id="making-multiple-plots-and-combining-them-with-grid.arrange" class="section level2">
-<h2>Making multiple plots and combining them with grid.arrange</h2>
 </div>
