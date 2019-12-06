@@ -67,8 +67,9 @@ email: ""
 # - Visitors
 ---
 
-I work as a statistical consultant, working with researchers at the University of
-Melbourne as well as clients outside the University. This can involve all stages
+I am a statistical consultant at the University of Melbourne, working with
+researchers at the University and clients outside the University.
+This can involve all stages
 of quantitative research: designing experiments or surveys, planning an appropriate
 analysis, analysing data, making graphs and communicating results clearly in
 papers or reports.
@@ -77,5 +78,4 @@ My blog here is a collection of my thoughts as a practicing statistician. Some o
 my posts are intended as resources for clients. Other posts will be more of interest
 to fellow statisticians.
 
-When I'm not thinking about statistics, I try to spend time out in nature:
-hiking, trail running, cycling, or camping.
+When I'm not thinking about statistics, I try to spend time out in nature---hiking, trail running, cycling, or camping.
