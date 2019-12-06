@@ -13,7 +13,7 @@ tags:
 subtitle: ''
 summary: 'In exploratory data analysis, it''s common to want to make similar
   plots of a number of variables at once. Here is a way to achieve
-  the same thing using R and `ggplot2`.'
+  this using R and `ggplot2`.'
 lastmod: '2019-11-26T11:00:00+11:00'
 featured: no
 image:
