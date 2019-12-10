@@ -1,14 +1,14 @@
 ---
 title: Understanding levels of variation and mixed models
 author: Cameron Patrick
-date: '2019-12-12'
-draft: true
+date: '2019-12-10'
+draft: false
 slug: understanding-levels-variation
 categories: []
 tags:
   - statistics
   - mixed models
-lastmod: '2019-12-12T15:00:00+11:00'
+lastmod: '2019-12-10T15:00:00+11:00'
 featured: no
 image:
   caption: ''
@@ -96,18 +96,21 @@ as a random effect.</p>
 </div>
 <div id="simpler-analysis-options" class="section level2">
 <h2>Simpler analysis options</h2>
-<p>As a practical consideration, random effects work best when they have a reasonable
-number of different levels. It may be better to treat a factor which is conceptually
-random as a fixed effect instead in some cases; e.g. if you are studying students
-from two or three schools, school should probably be a fixed effect rather than
-a random effect. There are also situations where this approach is not appropriate.</p>
 <p>It is sometimes possible to simplify an analysis if there are no variables which
 distinguish individuals at a particular level. For example, consider an experiment in
 which treatments were randomly assigned to litters of pigs but measurements were made on
 individual pigs, with no pig-level variables (e.g. sex) of interest in
 the analysis. In this situation, analysing litter averages would be a simpler analysis
 providing the same results as the mixed model.</p>
-<p>If in doubt about what your random effects are,
+<p>Another common situation is when there is a single within-subjects factor with two
+levels, for example before and after measurements. This kind of design can be
+analysed with a paired t-test or Wilcoxon signed rank test.</p>
+<p>As a practical consideration, random effects work best when they have a reasonable
+number of different levels. It may be better to treat a factor which is conceptually
+random as a fixed effect instead in some cases; e.g. if you are studying students
+from two or three schools, school should probably be a fixed effect rather than
+a random effect. There are also situations where this approach is not appropriate.</p>
+<p>If in doubt about how to analyse your multi-level data,
 <a href="https://scc.ms.unimelb.edu.au/">consult a statistician</a>.</p>
 </div>
 <div id="study-design-considerations" class="section level2">
