@@ -160,7 +160,7 @@ docs_section_pager = true  # Display pager in Docs layout (e.g. tutorials)?
 sharing = false
 
 # don't display author profile at bottom of page
-profile = false
+profile = true
 
 # Link authors to their profile page? (true/false)
 link_authors = false
